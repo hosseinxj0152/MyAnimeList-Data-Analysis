@@ -564,20 +564,154 @@ rating_means$anime_series_data.Score <-
 	as.numeric(rating_means$anime_series_data.Score)
 names(rating_means) <- c("Rating", "Score")
 g <-
-	ggplot(rating_means, aes(x = reorder(Rating, -Score), y = Score, fill = Rating)) +
+	ggplot(rating_means, aes(
+		x = reorder(Rating, -Score),
+		y = Score,
+		fill = Rating
+	)) +
 	geom_bar(stat = 'identity', color = 'white') +
 	xlab(label = 'Anime rating') +
 	ylab(label = 'Mean Score') +
 	ggtitle(label = 'MyAnimeList Score based on Rating') +
 	coord_cartesian(ylim = c(7.5, 8.3)) +
-	theme(legend.position = "none", 
+	theme(legend.position = "none",
 	      plot.title = element_text(hjust = .5))
 
 ggplotly(g)
 
 ## What are the top anime of all time?
-## Which studios are on the rise in the recent years?
-## Which series are the longest-running?
-## What is the relationship between genre and rating?
+
+top_anime <- anime_series_data[order(-anime_series_data$Score),]
+top_anime <- head(top_anime, 10)
+
+g <-
+	ggplot(top_anime, aes(x = reorder(Title, -Score), Score, fill = Title)) +
+	geom_bar(stat = 'identity', color = 'white') +
+	xlab(label = 'Title') +
+	ylab(label = 'Score') +
+	ggtitle(label = 'Top 10 anime on MyAnimeList') +
+	coord_cartesian(ylim = c(9, 9.3)) +
+	theme(
+		axis.text.x = element_text(
+			angle = 30,
+			vjust = 0.5,
+			hjust = 1
+		),
+		legend.position = 'none',
+		plot.title = element_text(hjust = .5)
+	)
+
+ggplotly(g)
+
+
+## What are the top 10 most popular of all time?
+
+pop_anime <- anime_series_data[order(-anime_series_data$Members),]
+pop_anime <- head(pop_anime, 10)
+
+g <-
+	ggplot(pop_anime, aes(x = reorder(Title, -Score), Score, fill = Title)) +
+	geom_bar(stat = 'identity', color = 'white') +
+	xlab(label = 'Title') +
+	ylab(label = 'Score') +
+	ggtitle(label = 'Top 10 most popular anime on MyAnimeList') +
+	coord_cartesian(ylim = c(7.5, 9.3)) +
+	theme(
+		axis.text.x = element_text(
+			angle = 30,
+			vjust = 0.5,
+			hjust = 1
+		),
+		legend.position = 'none',
+		plot.title = element_text(hjust = .5)
+	)
+
+ggplotly(g)
+
+
+## Which series have been on air the longest?
+
+anime_longevity <- anime_series_data
+anime_longevity[is.na(anime_longevity$`End airing`),]$`End airing` <- Sys.Date()
+anime_longevity$On_air <- anime_longevity$`End airing`- anime_longevity$`Start airing`
+anime_longevity$On_air <- as.numeric(gsub('.{5}$', '', anime_longevity$On_air))
+
+old_anime <- anime_longevity
+old_anime <- anime_longevity[order(-anime_longevity$On_air),]
+old_anime <- head(old_anime, 10)
+
+g <-
+	ggplot(old_anime, aes(x = reorder(Title, -Score), Score, fill = Title)) +
+	geom_bar(stat = 'identity', color = 'white') +
+	xlab(label = 'Title') +
+	ylab(label = 'Score') +
+	ggtitle(label = 'Top 10 anime with the longest record of being on TV on MyAnimeList') +
+	coord_cartesian(ylim = c(7.5, 9.3)) +
+	theme(
+		axis.text.x = element_text(
+			angle = 30,
+			vjust = 0.5,
+			hjust = 1
+		),
+		legend.position = 'none',
+		plot.title = element_text(hjust = .5)
+	)
+
+ggplotly(g)
+
+
+
+## Which series have the most number of episodes?
+
+ep_anime <- anime_series_data
+ep_anime$Episodes <- as.numeric(ep_anime$Episodes)
+ep_anime <- ep_anime[order(-ep_anime$Episodes),]
+ep_anime <- head(ep_anime, 10)
+
+g <-
+	ggplot(ep_anime, aes(x = reorder(Title, -Episodes), Episodes, fill = Title)) +
+	geom_bar(stat = 'identity', color = 'white') +
+	xlab(label = 'Title') +
+	ylab(label = 'Number of Episodes') +
+	ggtitle(label = 'Top 10 longest-running finished anime on MyAnimeList') +
+	theme(
+		axis.text.x = element_text(
+			angle = 30,
+			vjust = 0.5,
+			hjust = 1
+		),
+		legend.position = 'none',
+		plot.title = element_text(hjust = .5)
+	)
+
+ggplotly(g)
+
+
 ## Which anime are most favorited?
-## future projects
+
+fav_anime <- anime_series_data[order(-anime_series_data$Favorites),]
+fav_anime <- head(fav_anime, 10)
+
+g <-
+	ggplot(fav_anime, aes(x = reorder(Title, -Favorites), Favorites, fill = Title)) +
+	geom_bar(stat = 'identity', color = 'white') +
+	xlab(label = 'Title') +
+	ylab(label = 'Number of Favorites') +
+	ggtitle(label = 'Top 10 most-favorited anime on MyAnimeList') +
+	theme(
+		axis.text.x = element_text(
+			angle = 30,
+			vjust = 0.5,
+			hjust = 1
+		),
+		legend.position = 'none',
+		plot.title = element_text(hjust = .5)
+	)
+
+ggplotly(g)
+
+
+
+
+## Multivariate regression model for anime score
+## Future projects
