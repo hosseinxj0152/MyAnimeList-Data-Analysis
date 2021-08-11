@@ -76,7 +76,8 @@ g <- ggplot(myFrame, aes(
 	ylab(label = "Frequency") +
 	xlab(label = "Type of media") +
 	ggtitle(label = "Frequency of Anime based on type of media") +
-	theme(plot.title = element_text(hjust = 0.5))
+	theme(plot.title = element_text(hjust = 0.5),
+	      legend.position = 'none')
 
 
 ggplotly(g)
@@ -296,7 +297,7 @@ g <- ggplot(mean_score_start,
 	ylab(label = "Mean Score") +
 	ggtitle("MyAnimeList Score based on anime series starting season") +
 	theme(plot.title = element_text(hjust = 0.5)) +
-	coord_cartesian(ylim = c(7.5, 8)) +
+	coord_cartesian(ylim = c(7.8, 8)) +
 	theme(legend.position = "none")
 
 
@@ -377,9 +378,11 @@ names(mean_score_day) <-
 
 
 g <- ggplot(mean_score_day,
-	    aes(x = Weekday,
-	        y = Mean_Score,
-	        fill = Weekday)) +
+	    aes(
+	    	x = reorder(Weekday,-Mean_Score),
+	    	y = Mean_Score,
+	    	fill = Weekday
+	    )) +
 	geom_bar(stat = "identity", color = "white") +
 	xlab(label = "Broadcast day of Anime") +
 	ylab(label = "Mean Score") +
@@ -543,7 +546,7 @@ g <- ggplot(mean_score_s,
 	coord_cartesian(ylim = c(7.8, 8.3)) +
 	theme(legend.position = "none",
 	      axis.text = element_text(
-	      	angle = 90,
+	      	angle = 30,
 	      	vjust = .5,
 	      	hjust = 1
 	      ))
@@ -604,7 +607,7 @@ g <-
 ggplotly(g)
 
 
-## What are the top 10 most popular of all time?
+## What are the top 10 most popular series of all time?
 
 pop_anime <- anime_series_data[order(-anime_series_data$Members),]
 pop_anime <- head(pop_anime, 10)
@@ -632,21 +635,22 @@ ggplotly(g)
 ## Which series have been on air the longest?
 
 anime_longevity <- anime_series_data
-anime_longevity[is.na(anime_longevity$`End airing`),]$`End airing` <- Sys.Date()
-anime_longevity$On_air <- anime_longevity$`End airing`- anime_longevity$`Start airing`
-anime_longevity$On_air <- as.numeric(gsub('.{5}$', '', anime_longevity$On_air))
+anime_longevity[is.na(anime_longevity$`End airing`),]$`End airing` <-
+	Sys.Date()
+anime_longevity$On_air <-
+	anime_longevity$`End airing` - anime_longevity$`Start airing`
+anime_longevity$On_air <-
+	as.numeric(gsub('.{5}$', '', anime_longevity$On_air))
 
-old_anime <- anime_longevity
 old_anime <- anime_longevity[order(-anime_longevity$On_air),]
 old_anime <- head(old_anime, 10)
 
 g <-
-	ggplot(old_anime, aes(x = reorder(Title, -Score), Score, fill = Title)) +
+	ggplot(old_anime, aes(x = reorder(Title, -On_air), On_air, fill = Title)) +
 	geom_bar(stat = 'identity', color = 'white') +
 	xlab(label = 'Title') +
-	ylab(label = 'Score') +
+	ylab(label = 'On air time') +
 	ggtitle(label = 'Top 10 anime with the longest record of being on TV on MyAnimeList') +
-	coord_cartesian(ylim = c(7.5, 9.3)) +
 	theme(
 		axis.text.x = element_text(
 			angle = 30,
@@ -689,7 +693,8 @@ ggplotly(g)
 
 ## Which anime are most favorited?
 
-fav_anime <- anime_series_data[order(-anime_series_data$Favorites),]
+fav_anime <-
+	anime_series_data[order(-anime_series_data$Favorites),]
 fav_anime <- head(fav_anime, 10)
 
 g <-
@@ -711,7 +716,13 @@ g <-
 ggplotly(g)
 
 
-
-
 ## Multivariate regression model for anime score
+anime_series_data$Episodes <- as.numeric(anime_series_data$Episodes)
+anime_series_data <- na.omit(anime_series_data)
+score_fit <-
+	lm(Score ~ Episodes + `Starting season` + Sources + Rating + weekday + day_time ,
+	   data = anime_series_data)
+
+
+
 ## Future projects
