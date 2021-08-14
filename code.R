@@ -720,8 +720,9 @@ ggplotly(g)
 anime_series_data$Episodes <- as.numeric(anime_series_data$Episodes)
 anime_series_data <- na.omit(anime_series_data)
 score_fit <-
-	lm(Score ~ Episodes + `Starting season` + Sources + Rating + weekday + day_time ,
-	   data = anime_series_data)
+	lm(Score ~ Episodes + `Starting season` + Sources + Rating + weekday + 
+	   	day_time + Favorites + Members + `Scored by` ,
+		data = anime_series_data)
 
 
 

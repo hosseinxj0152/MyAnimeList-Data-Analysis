@@ -1,8 +1,10 @@
 ---
-title: "MyAnimeList Exploratory Data Analysis"
+title: "MyAnimeList Exploratory Data Analysis and Modelling"
 author: "Hossein FaridNasr"
-date: "8/10/2021"
+date: "8/14/2021"
 output: html_document
+
+
 ---
 
 ```{r setup, include=FALSE, cache=TRUE, warning=FALSE}
@@ -19,6 +21,7 @@ library(RColorBrewer)
 ## MyAnimeList Exploratory Data Analysis
 
 This project is an exploration of the MyAnimeList dataset provided on Kaggle.com.
+The .csv file, other plots and their codes can be found on [Github](https://github.com/hosseinxj0152/MyAnimeList-Data-Analysis).
 
 ### Importing the data   
 
@@ -53,7 +56,7 @@ anime_data$`End airing` <-
 	as.Date(anime_data$`End airing`, "%Y-%m-%d")
 ```
 
-Now we will see what percentage of our data is missing(NA) in a plot:
+Now we will see what percentage of our data in each column is missing(NA) in a plot:
 
 ```{r NAs, echo=FALSE,message=FALSE, warning=FALSE, error=FALSE, fig.pos = 'p', fig.align='center'}
 NAs_in_data <- apply(anime_data, MARGIN = 2,
@@ -91,6 +94,8 @@ In this part we ask a series of important questions about the data and try to an
 
 #### Which type of anime do we have more of?
 
+In this plot we can clearly see that most of the anime on MyAnimeList is a TV series followed by anime movies and then OVAs and Specials.
+
 ```{r type, echo=FALSE,message=FALSE, warning=FALSE, error=FALSE, fig.pos = 'p', fig.align='center'}
 prop_table <- as.matrix(table(anime_data$Type))
 myFrame <- as.data.frame((prop_table))
@@ -116,9 +121,10 @@ ggplotly(g)
 
 ```
 
-I wanted to have a pie chart here but was forced to use a barplot because there was a problem with coord_polar('y') for some reason apparently, it is currently an open issue in the ggplot2 package
 
 #### Which type of anime is more popular? series or movies?
+
+Here we see that the difference between the mean score of anime series and anime movies is really insignificant and we cannot conclude that the type of anime being a series or a movie has a meaningful relationship with its' score.
 
 ```{r type_pop, echo=FALSE,message=FALSE, warning=FALSE, error=FALSE, fig.pos = 'p', fig.align='center'}
 anime_series_data <-
@@ -165,6 +171,8 @@ ggplotly(g)
 
 #### Which status of anime series is more popular?
 
+Currently Airing Series have higher scores but by a really thing margin which again does not allow us to assume that there is a meaningful difference between scores of currently airing and finished anime series.
+
 ```{r status, echo=FALSE,message=FALSE, warning=FALSE, error=FALSE, fig.pos = 'p', fig.align='center'}
 temp <- as.data.frame(table(anime_series_data$Status))
 mean_score_status <- round(c(
@@ -195,6 +203,8 @@ ggplotly(g)
 
 #### Which years were the best for starting an anime series?
 
+Here we see that other than a few outliers in the years before 2000 where we have less data the general trend is upward and anime has been getting more and more popular by year.
+
 ```{r start_series, echo=FALSE,message=FALSE, warning=FALSE, error=FALSE, fig.pos = 'p', fig.align='center'}
 temp <- as.data.frame(table(year(anime_series_data$`Start airing`)))
 mean_score_start <-
@@ -222,6 +232,8 @@ ggplotly(g)
 
 #### Which years were the best for ending an anime series?
 
+Similar to the previous part, we see that on average newer anime have a higher score than older anime.
+
 ```{r end_series, echo=FALSE,message=FALSE, warning=FALSE, error=FALSE, fig.pos = 'p', fig.align='center'}
 temp <- as.data.frame(table(year(anime_series_data$`End airing`)))
 mean_score_end <-
@@ -248,6 +260,8 @@ ggplotly(g)
 ```
 
 #### Which year was the best for releasing an anime movie?
+
+We can see the same trend of rising scores for anime movies as well as anime series but there are a lot more ups and downs due to the number of anime movies being less than anime series in each year but the general trend is still upwards.
 
 ```{r release, echo=FALSE,message=FALSE, warning=FALSE, error=FALSE, fig.pos = 'p', fig.align='center'}
 temp <- as.data.frame(table(year(anime_movies_data$`Start airing`)))
@@ -277,6 +291,7 @@ ggplotly(g)
 
 #### Which season is most filled with anime?
 
+As shown in the plot Spring and Fall have a lot more anime than Winter and Summer, which could have many different reasons related to Japanese TV schedules, media culture, school season etc.		
 ```{r season, echo =FALSE,message=FALSE, warning=FALSE, error=FALSE, fig.pos = 'p', fig.align='center'}
 temp <- as.data.frame(table(anime_series_data$`Starting season`))
 
@@ -312,6 +327,8 @@ ggplotly(g)
 
 #### Which season is best for starting an anime series?
 
+Here we see that although the number of running anime changes between seasons the score they receive does fluctuate that much as the average score for Summer anime is only 0.05 less than other seasons. But as anime are also watched on DVDs and streaming servies later on those kinds of viewers could affect the score too.
+
 ```{r season_best, echo=FALSE,message=FALSE, warning=FALSE, error=FALSE, fig.pos = 'p', fig.align='center'}
 temp <- as.data.frame(table((anime_series_data$`Starting season`)))
 
@@ -343,6 +360,8 @@ ggplotly(g)
 ```
 
 #### Which day of the week is the most anime heavy?
+
+The data here shows us what we would expect of it. There are a lot more anime airing over the weekend than on any other day of the week.
 
 ```{r week, echo=FALSE,message=FALSE, warning=FALSE, error=FALSE, fig.pos = 'p', fig.align='center'}
 anime_series_data$weekday <- anime_series_data$`Broadcast time`
@@ -390,6 +409,8 @@ ggplotly(g)
 
 #### Which day of the week is better for anime broadcast time?
 
+As seen in the plot, there's not a meaningful correlation between the airing day of an anime and its' final score.
+
 ```{r day, echo=FALSE,message=FALSE, warning=FALSE, error=FALSE, fig.pos = 'p', fig.align='center'}
 anime_series_data$weekday <- anime_series_data$`Broadcast time`
 anime_series_data <-
@@ -433,6 +454,8 @@ ggplotly(g)
 ```
 
 #### Which time slot has the most amount of anime?
+
+There seems to be a lot of variety in the time slot of anime which means that on almost any hour you could go to a Japanese TV channel and find some anime you can watch!
 
 ```{r time, echo=FALSE,message=FALSE, warning=FALSE, error=FALSE, fig.pos = 'p', fig.align='center'}
 anime_series_data$day_time <-
@@ -480,6 +503,8 @@ ggplotly(g)
 
 #### Which time slot is the best for anime?
 
+The variety in the scores by time slot shows us that it might be a good predictor for the score of an anime.
+
 ```{r ts, echo=FALSE,message=FALSE, warning=FALSE, error=FALSE, fig.pos = 'p', fig.align='center'}
 anime_series_data$day_time <-
 	sapply(anime_series_data$`Broadcast time`, function(x) {
@@ -524,6 +549,8 @@ ggplotly(g)
 
 #### What percentage of anime come from a manga?
 
+Most of the anime aired on Japanese TV have the same source which is one of the different weekly manga publications. after the manga source we can see that there are a lot of original anime series and after that anime based on light novels and novels.
+
 ```{r source, echo=FALSE,message=FALSE, warning=FALSE, error=FALSE, fig.pos = 'p', fig.align='center'}
 temp <- as.data.frame(table(anime_series_data$Sources))
 
@@ -561,6 +588,7 @@ ggplotly(g)
 
 #### How does the source affect an the popularity of an anime?
 
+The highest average score per source belongs to visual novels and web manga respectively, however it can be due to the limited number of observations biasing the data or because visual novel fans are much more dedicated to their franchises but we cannot state anything more than that. 
 ```{r source_effect, echo=FALSE,message=FALSE, warning=FALSE, error=FALSE, fig.pos = 'p', fig.align='center'}
 temp <- as.data.frame(table((anime_series_data$Sources)))
 
@@ -597,6 +625,8 @@ ggplotly(g)
 
 #### How does the rating effect popularity?
 
+The data shows us that there's not that much of a difference in scores between different ratings for anime, although anime rated R seem to have a slight advantage over other ratings but as we have a lot of missing values, we cannot state anything more.
+
 ```{r rating, echo=FALSE,message=FALSE, warning=FALSE, error=FALSE, fig.pos = 'p', fig.align='center'}
 rating_means <-
 	aggregate(anime_series_data$Score ~ anime_series_data$Rating, FUN = mean)
@@ -620,32 +650,25 @@ g <-
 
 ggplotly(g)
 
-## What are the top anime of all time?
-
-top_anime <- anime_series_data[order(-anime_series_data$Score), ]
-top_anime <- head(top_anime, 10)
-
-g <-
-	ggplot(top_anime, aes(x = reorder(Title,-Score), Score, fill = Title)) +
-	geom_bar(stat = 'identity', color = 'white') +
-	xlab(label = 'Title') +
-	ylab(label = 'Score') +
-	ggtitle(label = 'Top 10 anime on MyAnimeList') +
-	coord_cartesian(ylim = c(9, 9.3)) +
-	theme(
-		axis.text.x = element_text(
-			angle = 30,
-			vjust = 0.5,
-			hjust = 1
-		),
-		legend.position = 'none',
-		plot.title = element_text(hjust = .5)
-	)
-
-ggplotly(g)
 
 ```
 
 
 ### Modelling
 
+Below we have provided a multivariate regression model on the anime series score based on factors such as number of episodes, starting season, source, rating etc.
+```{r modelling, message=FALSE, warning=FALSE, error=FALSE}
+anime_series_data$Episodes <- as.numeric(anime_series_data$Episodes)
+anime_series_data <- na.omit(anime_series_data)
+score_fit <-
+	lm(Score ~ Episodes + `Starting season` + Sources + Rating + weekday + 
+	   	day_time + Favorites + Members + `Scored by` ,
+		data = anime_series_data)
+summary(score_fit)
+```
+As you can see in the summary our R-squared has a value lower than 0.5 which could be alarming in predicting precise, physical processes but as peoples' taste in media and how they subjectively view TV series are relatively less predictable than phenomena with precise rules it can be accepted as a good model. The factors on which we have run a regression are the result of our exploratory analysis which showed us which of them were important to the final score.
+
+
+### Future Projects
+
+There are a lot more insights hidden in this dataset which can help discover new findings about the world of anime. For example, studying the relationship between genre and rating as well as genre and score, determining the rating based on the description using sentiment analysis. There is also some value in establishing which studios were the most successful comparing to the others.
