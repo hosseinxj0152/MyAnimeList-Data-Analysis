@@ -656,7 +656,7 @@ ggplotly(g)
 
 ### Modelling
 
-Below we have provided a multivariate regression model on the anime series score based on factors such as number of episodes, starting season, source, rating etc.
+Below we have provided a multiple regression model on the anime series score based on factors such as number of episodes, starting season, source, rating etc.
 ```{r modelling, message=FALSE, warning=FALSE, error=FALSE}
 anime_series_data$Episodes <- as.numeric(anime_series_data$Episodes)
 anime_series_data <- na.omit(anime_series_data)
